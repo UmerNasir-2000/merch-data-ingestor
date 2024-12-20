@@ -9,16 +9,17 @@ from item import Item
 def main() -> None:
     url = "https://www.wrestlingstore.pk/products/wwe-t-shirts/"
     page = 1
-    soup = BeautifulSoup(get_html(url), "html.parser")
     items: List[Item] = []
 
-    
     while True:
         _url = f"{url}/{page}"
         html = get_html(_url)
+        
         if not html:
             break
-        print(f"Fetching page {page}...")    
+        
+        print(f"Fetching page {page}...")   
+         
         soup = BeautifulSoup(html, "html.parser")
         item_boxes = soup.find_all("div", class_="item-box")
         if not item_boxes:
