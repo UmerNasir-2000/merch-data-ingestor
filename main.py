@@ -1,4 +1,5 @@
 import json
+import re
 from typing import List
 import requests
 from bs4 import BeautifulSoup
@@ -45,7 +46,14 @@ def extract_item_data(item_box) -> Item:
     image = item_box.find("img")["src"]
     link = item_box.find("a")["href"]
     discount = item_box.find("div", class_="item-discount").text
-    return Item(title, price, image, link, discount.strip())
+    original, discounted = parse_price_string(price)
+    return Item(title, original, discounted, image, link, discount.strip())
+
+def parse_price_string(price):
+    prices = re.findall(r'\d+', price)
+    original_price = float(prices[0])
+    discounted_price = float(prices[1])
+    return [original_price, discounted_price]
 
 def get_html(url: str) -> str:
     try:
