@@ -7,11 +7,25 @@ from requests.exceptions import RequestException
 from item import Item
 
 def main() -> None:
-    url = "https://www.wrestlingstore.pk/products/wwe-t-shirts.phps"
+    url = "https://www.wrestlingstore.pk/products/wwe-t-shirts/"
+    page = 1
     soup = BeautifulSoup(get_html(url), "html.parser")
+    items: List[Item] = []
+
     
-    item_boxes = soup.find_all("div", class_="item-box")
-    items: List[Item] = [extract_item_data(item_box) for item_box in item_boxes]
+    while True:
+        _url = f"{url}/{page}"
+        html = get_html(_url)
+        if not html:
+            break
+        print(f"Fetching page {page}...")    
+        soup = BeautifulSoup(html, "html.parser")
+        item_boxes = soup.find_all("div", class_="item-box")
+        if not item_boxes:
+            break
+
+        items.extend([extract_item_data(item_box) for item_box in item_boxes])
+        page += 1
     
     json_str = json.dumps([item.__dict__ for item in items], indent=4)
     with open("items.json", "w") as f:
